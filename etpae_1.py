@@ -1,6 +1,37 @@
 import numpy as np
 import json
 
+class ValeurConfigInvalide(Exception):
+    pass
+
+class ChampManquant(Exception):
+    pass
+
+def lire_config(chemin):
+    with open(chemin, "r") as f:
+        config = json.load(f)
+
+    champs_requis = ["largeur", "hauteur", "rayon", "mu", "balles"]
+    for champ in champs_requis:
+        if champ not in config:
+            raise ChampManquant(f"Champ manquant : {champ}")
+
+    if config["largeur"] <= 0 or config["hauteur"] <= 0:
+        raise ValeurConfigInvalide("Les dimensions doivent être positives")
+    if config["rayon"] <= 0:
+        raise ValeurConfigInvalide("Le rayon doit être positif")
+    if not (0 <= config["mu"] <= 1):
+        raise ValeurConfigInvalide("mu doit être entre 0 et 1")
+    if len(config["balles"]) == 0:
+        raise ValeurConfigInvalide("Il doit y avoir au moins une balle")
+
+    for i, balle in enumerate(config["balles"]):
+        if "position" not in balle or "theta" not in balle or "v0" not in balle:
+            raise ChampManquant(f"Champs manquants pour la balle {i}")
+        if balle["v0"] < 0:
+            raise ValeurConfigInvalide(f"v0 doit être positif pour la balle {i}")
+
+    return config
 
 class Noeud :
     def __init__(self, position, vitesse) :
