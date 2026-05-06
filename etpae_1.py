@@ -1,8 +1,9 @@
 import numpy as np
 
 class Noeud :
-    def __init__(self, position) :
+    def __init__(self, position, vitesse) :
         self.position = position
+        self.vitesse = vitesse
         self.droite = None
         self.gauche = None
         self.parent = None
@@ -16,63 +17,101 @@ class Balle:
         self.v = v0 * np.array([np.cos(theta_rad), np.sin(theta_rad)])
 
     def mise_a_jour(self, dt):
-       
         self.p = self.p + self.v * dt
 
     def get_position(self):
         return self.p.copy()
+    
+    def get_vitesse(self) :
+        return self.v.copy()
 
 
 class Simulation:
-    def __init__(self, largeur, hauteur, rayon, dt):
+    def __init__(self, largeur, hauteur, rayon, dt, mu, epsilon):
         self.largeur = largeur
         self.hauteur = hauteur
         self.r = rayon
         self.dt = dt
+        self.mu = mu
+        self.epsilon = epsilon
 
         self.p_min = np.array([rayon, rayon])
         self.p_max = np.array([largeur - rayon, hauteur - rayon])
 
-    def touche_bord(self, p):
-
-        return np.any(p <= self.p_min) or np.any(p >= self.p_max)
-    # Est-ce que la balle touche un mur ?
 
     def calculer_trajectoire(self, balle):
 
         if np.allclose(balle.v, [0, 0]) :
-            return Noeud(balle.get_position())
+            return Noeud(balle.get_position(), balle.get_vitesse())
         
-        racine = Noeud(balle.get_position())
+        racine = Noeud(balle.get_position(), balle.get_vitesse())
         pointeur = racine
 
         while True:
-            balle.mise_a_jour(self.dt)
-            nouvelle_position = balle.get_position()
+            #friction
+            balle.v = balle.v * (1 - (self.mu * self.dt))
 
-            nouveau_noeud = Noeud(nouvelle_position)
+            #rebonds
+            self.appliquer_rebond(balle)
+
+            #nouvelle position
+            balle.mise_a_jour(self.dt)
+
+            nouveau_noeud = Noeud(balle.get_position(), balle.get_vitesse())
             #on avance, nouv.position/nouv.noeud
 
-          
             pointeur.droite = nouveau_noeud
             nouveau_noeud.gauche = pointeur
             nouveau_noeud.parent = pointeur
-
             pointeur = nouveau_noeud
 
-            if self.touche_bord(nouvelle_position):
+            if np.linalg.norm(balle.v) <= self.epsilon :
                 break
 
         return racine
+    
+    def appliquer_rebond(self, balle) :
+        p = balle.get_position()
+        v = balle.get_vitesse()
+
+        #rebond gauche
+        if p[0] < self.p_min[0] :
+            p[0] = self.p_min[0]
+            n = np.array([1, 0])
+            v = v - 2 * np.dot(v, n) * n
+        
+        #rebond droit 
+        if p[0] > self.p_max[0] :
+            p[0] = self.p_max[0]
+            n = np.array([-1, 0])
+            v = v - 2 * np.dot(v, n) * n
+        
+        #rebond bas 
+        if p[1] < self.p_min[1] :
+            p[1] = self.p_min[1]
+            n = np.array([0, 1])
+            v = v - 2 * np.dot(v, n) * n
+
+        #rebond haut 
+        if p[1] > self.p_max[1] :
+            p[1] = self.p_max[1]
+            n = np.array([0, -1])
+            v = v - 2 * np.dot(v, n) * n
+
+        balle.p = p
+        balle.v = v
+
 
 ##Test, retourne juste positions et finale sans rebonds
 if __name__ == "__main__" :
-    largeur = 200
-    hauteur = 100
-    rayon = 1
+    largeur = 800
+    hauteur = 600
+    rayon = 10
     dt = 0.1
+    mu = 0.05
+    epsilon = 0.01
 
-    sim = Simulation(largeur, hauteur, rayon, dt)
+    sim = Simulation(largeur, hauteur, rayon, dt, mu, epsilon)
 
     p0 = [10, 10]
     theta = 45
@@ -82,6 +121,8 @@ if __name__ == "__main__" :
     trajectoire = sim.calculer_trajectoire(balle)
     noeud_courant = trajectoire
 
-    while noeud_courant is not None:
-        print(noeud_courant.position)
+    while noeud_courant is not None :
+        print(f"position: {noeud_courant.position}, vitesse: {noeud_courant.vitesse}")
         noeud_courant = noeud_courant.droite
+
+
