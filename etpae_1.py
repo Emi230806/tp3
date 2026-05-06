@@ -104,9 +104,9 @@ class Simulation:
 
 ##Test, retourne juste positions et finale sans rebonds
 if __name__ == "__main__" :
-    largeur = 200
-    hauteur = 100
-    rayon = 1
+    largeur = 800
+    hauteur = 600
+    rayon = 10
     dt = 0.1
     mu = 0.05
     epsilon = 0.01
@@ -115,7 +115,7 @@ if __name__ == "__main__" :
 
     p0 = [10, 10]
     theta = 45
-    v0 = 5
+    v0 = 20
 
     balle = Balle(p0, theta, v0)
     trajectoire = sim.calculer_trajectoire(balle)
