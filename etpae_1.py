@@ -1,4 +1,6 @@
 import numpy as np
+import json
+
 
 class Noeud :
     def __init__(self, position, vitesse) :
