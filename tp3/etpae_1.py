@@ -136,26 +136,28 @@ class Simulation:
 
 
 ##Test, retourne juste positions et finale sans rebonds
-if __name__ == "__main__" :
-    largeur = 800
-    hauteur = 600
-    rayon = 10
+if __name__ == "__main__":
     dt = 0.1
-    mu = 0.05
     epsilon = 0.01
 
-    sim = Simulation(largeur, hauteur, rayon, dt, mu, epsilon)
+    try:
+        config = lire_config("config.json")
+    except (ValeurConfigInvalide, ChampManquant) as e:
+        print(f"Erreur de configuration : {e}")
+        exit()
 
-    p0 = [10, 10]
-    theta = 45
-    v0 = 20
+    sim = Simulation(config["largeur"], config["hauteur"], config["rayon"], dt, config["mu"], epsilon)
 
-    balle = Balle(p0, theta, v0)
+    b = config["balles"][0]
+    balle = Balle(b["position"], b["theta"], b["v0"])
     trajectoire = sim.calculer_trajectoire(balle)
-    noeud_courant = trajectoire
 
-    while noeud_courant is not None :
-        print(f"position: {noeud_courant.position}, vitesse: {noeud_courant.vitesse}")
+    noeud_courant = trajectoire
+    i = 0
+    while noeud_courant is not None:
+        if i % 10 == 0:
+            print(f"position: {noeud_courant.position}, vitesse: {noeud_courant.vitesse}")
         noeud_courant = noeud_courant.droite
+        i += 1
 
 
