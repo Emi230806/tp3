@@ -1,9 +1,9 @@
 {
     "largeur":800,
-    "Hauteur":600,
-    "Rayon":10,
+    "hauteur":600,
+    "rayon":10,
     "mu":0.05,
-    "balle":[{
+    "balles":[{
         "position":[10,10],
         "theta":45,
         "v0":20

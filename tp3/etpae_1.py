@@ -137,11 +137,13 @@ class Simulation:
 
 ##Test, retourne juste positions et finale sans rebonds
 if __name__ == "__main__":
+    import os
     dt = 0.1
     epsilon = 0.01
 
     try:
-        config = lire_config("config.json")
+        chemin = os.path.join(os.path.dirname(__file__), "configurer.json")
+        config = lire_config(chemin)
     except (ValeurConfigInvalide, ChampManquant) as e:
         print(f"Erreur de configuration : {e}")
         exit()
