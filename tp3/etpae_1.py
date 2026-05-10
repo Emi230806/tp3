@@ -77,7 +77,7 @@ class Simulation:
         if np.allclose(balle.v, [0, 0]) :
             return Noeud(balle.get_position(), balle.get_vitesse())
         
-        racine = Noeud(balle.get_position(), balle.get_vitesse())
+        racine = Noeud(balle.get_position(), balle.get_vitesse()) #racine position initiale
         pointeur = racine
 
         while True:
@@ -149,11 +149,10 @@ if __name__ == "__main__":
         exit()
 
     sim = Simulation(config["largeur"], config["hauteur"], config["rayon"], dt, config["mu"], epsilon)
-
     b = config["balles"][0]
     balle = Balle(b["position"], b["theta"], b["v0"])
-    trajectoire = sim.calculer_trajectoire(balle)
 
+    trajectoire = sim.calculer_trajectoire(balle)
     noeud_courant = trajectoire
     i = 0
     while noeud_courant is not None:
