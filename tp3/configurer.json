@@ -1,0 +1,11 @@
+{
+    "largeur":800,
+    "hauteur":600,
+    "rayon":10,
+    "mu":0.05,
+    "balles":[{
+        "position":[10,10],
+        "theta":45,
+        "v0":20
+    }]
+}

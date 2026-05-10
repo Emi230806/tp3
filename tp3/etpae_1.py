@@ -1,4 +1,37 @@
 import numpy as np
+import json
+
+class ValeurConfigInvalide(Exception):
+    pass
+
+class ChampManquant(Exception):
+    pass
+
+def lire_config(chemin):
+    with open(chemin, "r") as f:
+        config = json.load(f)
+
+    champs_requis = ["largeur", "hauteur", "rayon", "mu", "balles"]
+    for champ in champs_requis:
+        if champ not in config:
+            raise ChampManquant(f"Champ manquant : {champ}")
+
+    if config["largeur"] <= 0 or config["hauteur"] <= 0:
+        raise ValeurConfigInvalide("Les dimensions doivent être positives")
+    if config["rayon"] <= 0:
+        raise ValeurConfigInvalide("Le rayon doit être positif")
+    if not (0 <= config["mu"] <= 1):
+        raise ValeurConfigInvalide("mu doit être entre 0 et 1")
+    if len(config["balles"]) == 0:
+        raise ValeurConfigInvalide("Il doit y avoir au moins une balle")
+
+    for i, balle in enumerate(config["balles"]):
+        if "position" not in balle or "theta" not in balle or "v0" not in balle:
+            raise ChampManquant(f"Champs manquants pour la balle {i}")
+        if balle["v0"] < 0:
+            raise ValeurConfigInvalide(f"v0 doit être positif pour la balle {i}")
+
+    return config
 
 class Noeud :
     def __init__(self, position, vitesse) :
@@ -44,7 +77,7 @@ class Simulation:
         if np.allclose(balle.v, [0, 0]) :
             return Noeud(balle.get_position(), balle.get_vitesse())
         
-        racine = Noeud(balle.get_position(), balle.get_vitesse())
+        racine = Noeud(balle.get_position(), balle.get_vitesse()) #racine position initiale
         pointeur = racine
 
         while True:
@@ -103,26 +136,29 @@ class Simulation:
 
 
 ##Test, retourne juste positions et finale sans rebonds
-if __name__ == "__main__" :
-    largeur = 800
-    hauteur = 600
-    rayon = 10
+if __name__ == "__main__":
+    import os
     dt = 0.1
-    mu = 0.05
     epsilon = 0.01
 
-    sim = Simulation(largeur, hauteur, rayon, dt, mu, epsilon)
+    try:
+        chemin = os.path.join(os.path.dirname(__file__), "configurer.json")
+        config = lire_config(chemin)
+    except (ValeurConfigInvalide, ChampManquant) as e:
+        print(f"Erreur de configuration : {e}")
+        exit()
 
-    p0 = [10, 10]
-    theta = 45
-    v0 = 20
+    sim = Simulation(config["largeur"], config["hauteur"], config["rayon"], dt, config["mu"], epsilon)
+    b = config["balles"][0]
+    balle = Balle(b["position"], b["theta"], b["v0"])
 
-    balle = Balle(p0, theta, v0)
     trajectoire = sim.calculer_trajectoire(balle)
     noeud_courant = trajectoire
-
-    while noeud_courant is not None :
-        print(f"position: {noeud_courant.position}, vitesse: {noeud_courant.vitesse}")
+    i = 0
+    while noeud_courant is not None:
+        if i % 10 == 0:
+            print(f"position: {noeud_courant.position}, vitesse: {noeud_courant.vitesse}")
         noeud_courant = noeud_courant.droite
+        i += 1
 
 
