@@ -4,6 +4,8 @@ from etpae_1 import Simulation, Balle
 largeur  = 800
 hauteur  = 600
 epaisseur_bande = 15
+rayon    = 10
+delai_ms = 16
 
 fenetre = tk.Tk()
 fenetre.resizable(False, False) # Empêche le redimensionnement de la fenêtre.
@@ -25,6 +27,29 @@ def dessiner_terrain():
     e_b = epaisseur_bande
     canvas.create_rectangle(0, 0, largeur + 2*e_b, hauteur + 2*e_b, fill="dark green", outline="")
     canvas.create_rectangle(e_b, e_b, e_b + largeur, e_b + hauteur, fill="green", outline="")
+
+def sim_vers_canvas(px, py):
+    cx = epaisseur_bande + px
+    cy = epaisseur_bande + (hauteur - py)
+    return cx, cy
+
+noeud_courant = None
+after_id      = None
+
+def dessiner_balle(px, py):
+    canvas.delete("balle")
+    cx, cy = sim_vers_canvas(px, py)
+    r = rayon
+    canvas.create_oval(cx - r, cy - r, cx + r, cy + r, fill="white", outline="black", tags="balle")
+    
+def animer():
+    global noeud_courant, after_id
+    if noeud_courant is None:
+        return
+    dessiner_balle(*noeud_courant.position)
+    noeud_courant = noeud_courant.droite
+    if noeud_courant is not None:
+        after_id = fenetre.after(delai_ms, animer)
 
 dessiner_terrain()
 fenetre.mainloop()
