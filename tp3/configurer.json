@@ -4,7 +4,7 @@
     "rayon":10,
     "mu":0.05,
     "balles":[{
-        "position":[300,200]
+        "position":[215,300]
     }],
     "epaisseur_bande" : 15,
     "delai_ms" : 16

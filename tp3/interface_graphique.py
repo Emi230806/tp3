@@ -42,7 +42,7 @@ def sim_vers_canvas(px, py):
     return cx, cy
 
 noeud_courant = None
-after_id      = None
+after_id = None
 
 def dessiner_balle(px, py):
     canvas.delete("balle")
