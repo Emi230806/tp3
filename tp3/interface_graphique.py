@@ -1,6 +1,5 @@
 import tkinter as tk
-from etpae_1 import Simulation, Balle, lire_config
-import json
+from etpae_1 import Simulation, Balle, lire_config, dt, epsilon
 import os
 
 chemin = os.path.join(os.path.dirname(__file__), "configurer.json")
@@ -57,8 +56,8 @@ def simuler():
         after_id = None
 
     dessiner_terrain()
-    balle = Balle(config["p0"], config["theta"], config["v0"])
-    sim = Simulation(config["largeur"], config["hauteur"], config["rayon"], config["dt"], config["mu"], config["epsilon"])
+    balle = Balle(config["balles"][0]["position"], config["balles"][0]["theta"], config["balles"][0]["v0"])
+    sim = Simulation(config["largeur"], config["hauteur"], config["rayon"], dt, config["mu"], epsilon)
     trajectoire = sim.calculer_trajectoire(balle)
     dernier = trajectoire
     while dernier.droite is not None:

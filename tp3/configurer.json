@@ -6,6 +6,8 @@
     "balles":[{
         "position":[10,10],
         "theta":45,
-        "v0":20
-    }]
+        "v0":100
+    }],
+    "epaisseur_bande" : 15,
+    "delai_ms" : 16
 }
