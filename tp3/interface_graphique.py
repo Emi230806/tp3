@@ -1,21 +1,14 @@
 import tkinter as tk
-from etpae_1 import Simulation, Balle
+from etpae_1 import Simulation, Balle, lire_config
+import json
+import os
 
-largeur = 800
-hauteur = 600
-epaisseur_bande = 15
-rayon = 10
-delai_ms = 16
-mu = 0.05
-epsilon = 0.01
-dt = 0.1
-p0 = [10, 10]
-theta = 45
-v0 = 200
+chemin = os.path.join(os.path.dirname(__file__), "configurer.json")
+config = lire_config(chemin)
 
 fenetre = tk.Tk()
 fenetre.resizable(False, False) # Empêche le redimensionnement de la fenêtre.
-canvas = tk.Canvas(fenetre, width=largeur + 2 * epaisseur_bande,height=hauteur + 2 * epaisseur_bande, bg="white")
+canvas = tk.Canvas(fenetre, width=config["largeur"] + 2 * config["epaisseur_bande"], height=config["hauteur"] + 2 * config["epaisseur_bande"], bg="white")
 canvas.pack()
 
 lbl_pos = tk.Label(fenetre, text="Position finale : –")
@@ -30,13 +23,13 @@ bouton_recommencer.pack(side="left", padx=4)
 
 def dessiner_terrain():
     canvas.delete("all")
-    e_b = epaisseur_bande
-    canvas.create_rectangle(0, 0, largeur + 2*e_b, hauteur + 2*e_b, fill="dark green", outline="")
-    canvas.create_rectangle(e_b, e_b, e_b + largeur, e_b + hauteur, fill="green", outline="")
+    e_b = config["epaisseur_bande"]
+    canvas.create_rectangle(0, 0, config["largeur"] + 2*e_b, config["hauteur"] + 2*e_b, fill="dark green", outline="")
+    canvas.create_rectangle(e_b, e_b, e_b + config["largeur"], e_b + config["hauteur"], fill="green", outline="")
 
 def sim_vers_canvas(px, py):
-    cx = epaisseur_bande + px
-    cy = epaisseur_bande + (hauteur - py)
+    cx = config["epaisseur_bande"] + px
+    cy = config["epaisseur_bande"] + (config["hauteur"] - py)
     return cx, cy
 
 noeud_courant = None
@@ -45,7 +38,7 @@ after_id      = None
 def dessiner_balle(px, py):
     canvas.delete("balle")
     cx, cy = sim_vers_canvas(px, py)
-    r = rayon
+    r = config["rayon"]
     canvas.create_oval(cx - r, cy - r, cx + r, cy + r, fill="white", outline="black", tags="balle")
 
 def animer():
@@ -55,7 +48,7 @@ def animer():
     dessiner_balle(*noeud_courant.position)
     noeud_courant = noeud_courant.droite
     if noeud_courant is not None:
-        after_id = fenetre.after(delai_ms, animer)
+        after_id = fenetre.after(config["delai_ms"], animer)
         
 def simuler():
     global noeud_courant, after_id
@@ -64,8 +57,8 @@ def simuler():
         after_id = None
 
     dessiner_terrain()
-    balle = Balle(p0, theta, v0)
-    sim = Simulation(largeur, hauteur, rayon, dt, mu, epsilon)
+    balle = Balle(config["p0"], config["theta"], config["v0"])
+    sim = Simulation(config["largeur"], config["hauteur"], config["rayon"], config["dt"], config["mu"], config["epsilon"])
     trajectoire = sim.calculer_trajectoire(balle)
     dernier = trajectoire
     while dernier.droite is not None:
