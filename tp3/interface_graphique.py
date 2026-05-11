@@ -1,6 +1,35 @@
 import tkinter as tk
-from etpae_1 import Simulation, Balle, lire_config, dt, epsilon
+from etpae_1 import Simulation, Balle, dt, epsilon
 import os
+import json
+
+class ValeurConfigInvalide(Exception):
+    pass
+
+class ChampManquant(Exception):
+    pass
+
+def lire_config(chemin):
+    with open(chemin, "r") as f:
+        config = json.load(f)
+
+    champs_requis = ["largeur", "hauteur", "rayon", "balles"]
+    for champ in champs_requis:
+        if champ not in config:
+            raise ChampManquant(f"Champ manquant : {champ}")
+
+    if config["largeur"] <= 0 or config["hauteur"] <= 0:
+        raise ValeurConfigInvalide("Les dimensions doivent être positives")
+    if config["rayon"] <= 0:
+        raise ValeurConfigInvalide("Le rayon doit être positif")
+    if len(config["balles"]) == 0:
+        raise ValeurConfigInvalide("Il doit y avoir au moins une balle")
+
+    for i, balle in enumerate(config["balles"]):
+        if "position" not in balle:
+            raise ChampManquant(f"Champ manquant pour la balle {i}")
+
+    return config
 
 chemin = os.path.join(os.path.dirname(__file__), "configurer.json")
 config = lire_config(chemin)
@@ -111,6 +140,14 @@ def reset():
     noeud_courant = None
     lbl_pos.config(text="Position finale : –")
     dessiner_terrain()
+
+try:
+        chemin = os.path.join(os.path.dirname(__file__), "configurer.json")
+        config = lire_config(chemin)
+
+except (ValeurConfigInvalide, ChampManquant) as e:
+        print(f"Erreur de configuration : {e}")
+        exit()
 
 bouton_tirer.config(command=simuler)
 bouton_recommencer.config(command=reset)
