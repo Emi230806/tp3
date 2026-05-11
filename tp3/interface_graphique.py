@@ -30,6 +30,11 @@ label_theta_0.pack(side = "left", padx = 4)
 champ_theta_0  = tk.Entry(cadre_boutons, width = 10)
 champ_theta_0.pack(side="left", padx=4)
 
+label_mu = tk.Label(cadre_boutons, text = "Coeffcient de frottement : ")
+label_mu.pack(side = "left", padx = 4)
+champ_mu  = tk.Entry(cadre_boutons, width = 10)
+champ_mu.pack(side="left", padx=4)
+
 def dessiner_terrain():
     canvas.delete("all")
     e_b = config["epaisseur_bande"]
@@ -76,10 +81,16 @@ def simuler():
     except ValueError:
         lbl_pos.config(text="Angle invalide ou manquant")
         return
+    
+    try :
+        mu = float(champ_mu.get())
+    except ValueError:
+        lbl_pos.config(text="Coefficient de frottement invalide ou manquant")
+        return
 
     dessiner_terrain()
     balle = Balle(config["balles"][0]["position"], theta, v0)
-    sim = Simulation(config["largeur"], config["hauteur"], config["rayon"], dt, config["mu"], epsilon)
+    sim = Simulation(config["largeur"], config["hauteur"], config["rayon"], dt, mu, epsilon)
     trajectoire = sim.calculer_trajectoire(balle)
     dernier = trajectoire
     while dernier.droite is not None:
