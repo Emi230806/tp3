@@ -1,5 +1,6 @@
 import numpy as np
 import json
+import os
 
 dt  = 0.1
 epsilon = 0.01
@@ -133,6 +134,14 @@ class Simulation:
         balle.p = p
         balle.v = v
 
+try:
+        chemin = os.path.join(os.path.dirname(__file__), "configurer.json")
+        config = lire_config(chemin)
 
+except (ValeurConfigInvalide, ChampManquant) as e:
+        print(f"Erreur de configuration : {e}")
+        exit()
+
+    
 
 
