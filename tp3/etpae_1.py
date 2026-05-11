@@ -29,10 +29,8 @@ def lire_config(chemin):
         raise ValeurConfigInvalide("Il doit y avoir au moins une balle")
 
     for i, balle in enumerate(config["balles"]):
-        if "position" not in balle or "theta" not in balle or "v0" not in balle:
-            raise ChampManquant(f"Champs manquants pour la balle {i}")
-        if balle["v0"] < 0:
-            raise ValeurConfigInvalide(f"v0 doit être positif pour la balle {i}")
+        if "position" not in balle:
+            raise ChampManquant(f"Champ manquant pour la balle {i}")
 
     return config
 

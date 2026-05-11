@@ -20,6 +20,16 @@ bouton_tirer.pack(side="left", padx=4)
 bouton_recommencer = tk.Button(cadre_boutons, text="Recommencer")
 bouton_recommencer.pack(side="left", padx=4)
 
+label_vitesse_0 = tk.Label(cadre_boutons, text = "Vitesse initale : ")
+label_vitesse_0.pack(side = "left", padx = 4)
+champ_vitesse_0  = tk.Entry(cadre_boutons, width = 10)
+champ_vitesse_0.pack(side="left", padx=4)
+
+label_theta_0 = tk.Label(cadre_boutons, text = "Angle initial : ")
+label_theta_0.pack(side = "left", padx = 4)
+champ_theta_0  = tk.Entry(cadre_boutons, width = 10)
+champ_theta_0.pack(side="left", padx=4)
+
 def dessiner_terrain():
     canvas.delete("all")
     e_b = config["epaisseur_bande"]
@@ -55,8 +65,20 @@ def simuler():
         fenetre.after_cancel(after_id)
         after_id = None
 
+    try:
+        v0 = float(champ_vitesse_0.get())
+    except ValueError:
+        lbl_pos.config(text="Vitesse invalide ou manquante")
+        return
+
+    try:
+        theta = float(champ_theta_0.get())
+    except ValueError:
+        lbl_pos.config(text="Angle invalide ou manquant")
+        return
+
     dessiner_terrain()
-    balle = Balle(config["balles"][0]["position"], config["balles"][0]["theta"], config["balles"][0]["v0"])
+    balle = Balle(config["balles"][0]["position"], theta, v0)
     sim = Simulation(config["largeur"], config["hauteur"], config["rayon"], dt, config["mu"], epsilon)
     trajectoire = sim.calculer_trajectoire(balle)
     dernier = trajectoire
