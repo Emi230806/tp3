@@ -25,8 +25,8 @@ cadre_boutons = tk.Frame(fenetre)
 cadre_boutons.pack(pady=4)
 bouton_tirer = tk.Button(cadre_boutons, text="Tirer")
 bouton_tirer.pack(side="left", padx=4)
-bouton_reset = tk.Button(cadre_boutons, text="Recommencer")
-bouton_reset.pack(side="left", padx=4)
+bouton_recommencer = tk.Button(cadre_boutons, text="Recommencer")
+bouton_recommencer.pack(side="left", padx=4)
 
 def dessiner_terrain():
     canvas.delete("all")
@@ -76,7 +76,19 @@ def simuler():
     noeud_courant = trajectoire
     animer()
 
+def reset():
+    global noeud_courant, after_id
+
+    if after_id is not None:
+        fenetre.after_cancel(after_id)
+        after_id = None
+
+    noeud_courant = None
+    lbl_pos.config(text="Position finale : –")
+    dessiner_terrain()
+
 bouton_tirer.config(command=simuler)
+bouton_recommencer.config(command=reset)
 
 dessiner_terrain()
 fenetre.mainloop()
