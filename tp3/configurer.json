@@ -2,6 +2,7 @@
     "largeur":800,
     "hauteur":600,
     "rayon":10,
+    "mu" : 0.1,
     "balles":[{
         "position":[215,300]
     }],

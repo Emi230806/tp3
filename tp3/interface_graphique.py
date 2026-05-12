@@ -31,11 +31,20 @@ def lire_config(chemin):
 
     return config
 
-chemin = os.path.join(os.path.dirname(__file__), "configurer.json")
-config = lire_config(chemin)
+try:
+    chemin = os.path.join(os.path.dirname(__file__), "configurer.json")
+    config = lire_config(chemin)
+except (ValeurConfigInvalide, ChampManquant) as e:
+    import tkinter.messagebox as mb
+    root = tk.Tk()
+    root.withdraw()
+    mb.showerror("Erreur de configuration", str(e))
+    exit()
+
 
 fenetre = tk.Tk()
 fenetre.resizable(False, False) # Empêche le redimensionnement de la fenêtre.
+
 canvas = tk.Canvas(fenetre, width=config["largeur"] + 2 * config["epaisseur_bande"], height=config["hauteur"] + 2 * config["epaisseur_bande"], bg="white")
 canvas.pack()
 
@@ -63,6 +72,7 @@ label_mu = tk.Label(cadre_boutons, text = "Coeffcient de frottement : ")
 label_mu.pack(side = "left", padx = 4)
 champ_mu  = tk.Entry(cadre_boutons, width = 10)
 champ_mu.pack(side="left", padx=4)
+champ_mu.insert(0, str(config["mu"]))
 
 def dessiner_terrain():
     canvas.delete("all")
@@ -113,9 +123,11 @@ def simuler():
     
     try :
         mu = float(champ_mu.get())
-    except ValueError:
-        lbl_pos.config(text="Coefficient de frottement invalide ou manquant")
-        return
+        if not (0 <= mu < 1) :
+            lbl_pos.config(text="le mu doit être entre 0 et 1")
+            return
+    except ValueError :
+        lbl_pos.config(text = "mu invalide ou manquant")
 
     dessiner_terrain()
     balle = Balle(config["balles"][0]["position"], theta, v0)
@@ -141,16 +153,8 @@ def reset():
     lbl_pos.config(text="Position finale : –")
     dessiner_terrain()
 
-try:
-        chemin = os.path.join(os.path.dirname(__file__), "configurer.json")
-        config = lire_config(chemin)
-
-except (ValeurConfigInvalide, ChampManquant) as e:
-        print(f"Erreur de configuration : {e}")
-        exit()
-
-bouton_tirer.config(command=simuler)
-bouton_recommencer.config(command=reset)
+bouton_tirer.config(command = simuler)
+bouton_recommencer.config(command = reset)
 
 dessiner_terrain()
 fenetre.mainloop()

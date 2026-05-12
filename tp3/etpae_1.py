@@ -1,6 +1,4 @@
 import numpy as np
-import json
-import os
 
 dt  = 0.1
 epsilon = 0.01
