@@ -2,6 +2,7 @@ import tkinter as tk
 from etpae_1 import Simulation, Balle, dt, epsilon
 import os
 import json
+from tkinter import filedialog
 
 class ValeurConfigInvalide(Exception):
     pass
@@ -31,13 +32,22 @@ def lire_config(chemin):
 
     return config
 
+root_temp = tk.Tk()
+root_temp.withdraw()
+
+chemin = filedialog.askopenfilename(
+    title="Choisir un fichier JSON",
+    filetypes=[("Fichiers JSON", "*.json")]
+)
+
+if not chemin:
+    exit()
+
 try:
-    chemin = os.path.join(os.path.dirname(__file__), "configurer.json")
     config = lire_config(chemin)
+
 except (ValeurConfigInvalide, ChampManquant) as e:
     import tkinter.messagebox as mb
-    root = tk.Tk()
-    root.withdraw()
     mb.showerror("Erreur de configuration", str(e))
     exit()
 
