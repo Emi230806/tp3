@@ -2,10 +2,10 @@
     "largeur":800,
     "hauteur":600,
     "rayon":10,
-    "mu":0.05,
+    "mu" : 0.1,
     "balles":[{
-        "position":[10,10],
-        "theta":45,
-        "v0":20
-    }]
+        "position":[215,300]
+    }],
+    "epaisseur_bande" : 15,
+    "delai_ms" : 16
 }

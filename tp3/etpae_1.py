@@ -1,7 +1,6 @@
 import numpy as np
 import json
 
-
 class ValeurConfigInvalide(Exception):
     pass
 
@@ -43,11 +42,11 @@ class Noeud :
         self.parent = None
 
 class Balle:
-    def __init__(self, p0, theta, v0):
+    def __init__(self, position, theta, v0):
 
         theta_rad = np.radians(theta)
 
-        self.p = np.array(p0, dtype=float)
+        self.p = np.array(position, dtype=float)
         self.v = v0 * np.array([np.cos(theta_rad), np.sin(theta_rad)])
 
     def mise_a_jour(self, dt):
@@ -137,7 +136,7 @@ class Simulation:
 
 
 ##Test, retourne juste positions et finale sans rebonds
-if __name__ == "__main__":          
+if __name__ == "__main__":
     import os
     dt = 0.1
     epsilon = 0.01
