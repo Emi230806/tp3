@@ -1,4 +1,5 @@
 import tkinter as tk
+import tkinter
 from etpae_1 import Simulation, Balle, dt, epsilon
 import os
 import json
@@ -35,10 +36,7 @@ def lire_config(chemin):
 root_temp = tk.Tk()
 root_temp.withdraw()
 
-chemin = filedialog.askopenfilename(
-    title="Choisir un fichier JSON",
-    filetypes=[("Fichiers JSON", "*.json")]
-)
+chemin = tkinter.filedialog.askopenfilename(title="Choisir un fichier JSON", filetypes=[("Fichiers JSON", "*.json")])
 
 if not chemin:
     exit()
