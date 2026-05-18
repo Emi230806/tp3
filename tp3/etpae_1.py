@@ -1,6 +1,7 @@
 import numpy as np
 import json
 
+
 class ValeurConfigInvalide(Exception):
     pass
 
@@ -136,7 +137,7 @@ class Simulation:
 
 
 ##Test, retourne juste positions et finale sans rebonds
-if __name__ == "__main__":
+if __name__ == "__main__":          
     import os
     dt = 0.1
     epsilon = 0.01
