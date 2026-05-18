@@ -119,6 +119,9 @@ def simuler():
 
     try:
         v0 = float(champ_vitesse_0.get())
+        if v0 <= 0:
+            lbl_pos.config(text="La vitesse doit être positive")
+            return
     except ValueError:
         lbl_pos.config(text="Vitesse invalide ou manquante")
         return
