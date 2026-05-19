@@ -67,6 +67,12 @@ bouton_tirer = tk.Button(cadre_boutons, text="Tirer")
 bouton_tirer.pack(side="left", padx=4)
 bouton_recommencer = tk.Button(cadre_boutons, text="Recommencer")
 bouton_recommencer.pack(side="left", padx=4)
+bouton_precedent = tk.Button(cadre_boutons, text="Pas précédent", state="disabled")
+bouton_precedent.pack(side="left", padx=4)
+bouton_suivant = tk.Button(cadre_boutons, text="Pas suivant", state="disabled")
+bouton_suivant.pack(side="left", padx=4)
+bouton_position_finale = tk.Button(cadre_boutons, text="Position finale", state="disabled")
+bouton_position_finale.pack(side="left", padx=4)
 
 label_vitesse_0 = tk.Label(cadre_boutons, text = "Vitesse initale : ")
 label_vitesse_0.pack(side = "left", padx = 4)
@@ -104,20 +110,47 @@ def dessiner_balle(px, py):
     r = config["rayon"]
     canvas.create_oval(cx - r, cy - r, cx + r, cy + r, fill="white", outline="black", tags="balle")
 
-def animer():
-    global noeud_courant, after_id
+def mettre_a_jour_boutons():
+    if noeud_courant is None or noeud_courant.gauche is None:
+        bouton_precedent.config(state="disabled")
+    else:
+        bouton_precedent.config(state="normal")
+
+    if noeud_courant is None or noeud_courant.droite is None:
+        bouton_suivant.config(state="disabled")
+        bouton_position_finale.config(state="disabled")
+    else:
+        bouton_suivant.config(state="normal")
+        bouton_position_finale.config(state="normal")
+
+def pas_suivant():
+    global noeud_courant
+    if noeud_courant is not None and noeud_courant.droite is not None:
+        noeud_courant = noeud_courant.droite
+        dessiner_terrain()
+        dessiner_balle(*noeud_courant.position)
+        mettre_a_jour_boutons()
+
+def pas_precedent():
+    global noeud_courant
+    if noeud_courant is not None and noeud_courant.gauche is not None:
+        noeud_courant = noeud_courant.gauche
+        dessiner_terrain()
+        dessiner_balle(*noeud_courant.position)
+        mettre_a_jour_boutons()
+
+def aller_position_finale():
+    global noeud_courant
     if noeud_courant is None:
         return
+    while noeud_courant.droite is not None:
+        noeud_courant = noeud_courant.droite
+    dessiner_terrain()
     dessiner_balle(*noeud_courant.position)
-    noeud_courant = noeud_courant.droite
-    if noeud_courant is not None:
-        after_id = fenetre.after(config["delai_ms"], animer)
+    mettre_a_jour_boutons()
         
 def simuler():
-    global noeud_courant, after_id
-    if after_id is not None:
-        fenetre.after_cancel(after_id)
-        after_id = None
+    global noeud_courant, racine
 
     try:
         v0 = float(champ_vitesse_0.get())
@@ -145,29 +178,32 @@ def simuler():
     dessiner_terrain()
     balle = Balle(config["balles"][0]["position"], theta, v0)
     sim = Simulation(config["largeur"], config["hauteur"], config["rayon"], dt, mu, epsilon)
-    trajectoire = sim.calculer_trajectoire(balle)
-    dernier = trajectoire
+    racine = sim.calculer_trajectoire(balle)
+    dernier = racine
     while dernier.droite is not None:
         dernier = dernier.droite
     px, py = dernier.position
     lbl_pos.config(text=f"Position finale : ({px:.1f}, {py:.1f})")
 
-    noeud_courant = trajectoire
-    animer()
+    noeud_courant = racine
+    dessiner_balle(*noeud_courant.position)
+    mettre_a_jour_boutons()
 
 def reset():
-    global noeud_courant, after_id
-
-    if after_id is not None:
-        fenetre.after_cancel(after_id)
-        after_id = None
-
+    global noeud_courant, racine
     noeud_courant = None
+    racine = None
     lbl_pos.config(text="Position finale : –")
     dessiner_terrain()
+    bouton_precedent.config(state="disabled")
+    bouton_suivant.config(state="disabled")
+    bouton_position_finale.config(state="disabled")
 
-bouton_tirer.config(command = simuler)
-bouton_recommencer.config(command = reset)
+bouton_tirer.config(command=simuler)
+bouton_recommencer.config(command=reset)
+bouton_precedent.config(command=pas_precedent)
+bouton_suivant.config(command=pas_suivant)
+bouton_position_finale.config(command=aller_position_finale)
 
 dessiner_terrain()
 fenetre.mainloop()
